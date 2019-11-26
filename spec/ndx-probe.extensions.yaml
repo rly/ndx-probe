@@ -25,9 +25,14 @@ groups:
   - target_type: Tetrode
     doc: The individual tetrode groups that are part of this shank.
     quantity: '*'
+  - target_type: Stereotrode
+    doc: The individual tetrode groups that are part of this shank.
+    quantity: '*'
 - neurodata_type_def: Probe
   neurodata_type_inc: ElectrodeGroup
-  doc: A subtype of ElectrodeGroup to include metadata about a multi-electrode probe.
+  doc: A subtype of ElectrodeGroup to include metadata about a multi-electrode probe,
+    which contains one or many shanks, each of which may contain tetrode groups, each
+    of which contains links to electrodes.
   attributes:
   - name: model
     dtype: text
@@ -97,9 +102,5 @@ groups:
       of this probe.
   links:
   - target_type: Shank
-    doc: The individual tetrode groups that are part of this shank. Not necessary
-      if there is only one shank on the probe
-    quantity: '*'
-  - target_type: Tetrode
-    doc: The individual tetrode groups that are part of this shank.
-    quantity: '*'
+    doc: The individual shanks that are part of this probe.
+    quantity: +

@@ -19,6 +19,28 @@ def main():
     ns_builder.include_type('ElectrodeGroup', namespace='core')
     ns_builder.include_type('DynamicTableRegion', namespace='hdmf.common')
 
+    stereotrode = NWBGroupSpec(
+        neurodata_type_def='Stereotrode',
+        neurodata_type_inc='ElectrodeGroup',
+        doc=('A subtype of ElectrodeGroup to include metadata about a single stereotrode (group of 2 closely spaced '
+             'electrodes) on a shank of a probe.'),
+        attributes=[
+            NWBAttributeSpec(
+                name='location',
+                doc=('Location of the stereotrode in the brain.'),
+                dtype='text',
+                required=False
+            )
+        ],
+        datasets=[
+            NWBDatasetSpec(
+                name='electrodes',
+                neurodata_type_inc='DynamicTableRegion',
+                doc='Pointer to the rows of the electrodes table corresponding to the electrodes of this stereotrode.',
+            )
+        ]
+    )
+
     tetrode = NWBGroupSpec(
         neurodata_type_def='Tetrode',
         neurodata_type_inc='ElectrodeGroup',
@@ -54,6 +76,9 @@ def main():
         ],
         links=[
             NWBLinkSpec(target_type='Tetrode',
+                        doc='The individual tetrode groups that are part of this shank.',
+                        quantity='*'),
+            NWBLinkSpec(target_type='Stereotrode',
                         doc='The individual tetrode groups that are part of this shank.',
                         quantity='*')
         ]
@@ -144,7 +169,9 @@ def main():
     probe = NWBGroupSpec(
         neurodata_type_def='Probe',
         neurodata_type_inc='ElectrodeGroup',
-        doc=('A subtype of ElectrodeGroup to include metadata about a multi-electrode probe.'),
+        doc=('A subtype of ElectrodeGroup to include metadata about a multi-electrode probe, which contains '
+             'one or many shanks, each of which may contain tetrode groups, each of which contains links to '
+             'electrodes.'),
         attributes=[
             NWBAttributeSpec(
                 name='model',
@@ -169,12 +196,8 @@ def main():
         ],
         links=[
             NWBLinkSpec(target_type='Shank',
-                        doc=('The individual tetrode groups that are part of this shank. Not necessary if there is '
-                             'only one shank on the probe'),
-                        quantity='*'),
-            NWBLinkSpec(target_type='Tetrode',
-                        doc='The individual tetrode groups that are part of this shank.',
-                        quantity='*')
+                        doc='The individual shanks that are part of this probe.',
+                        quantity='+')
         ]
     )
 
