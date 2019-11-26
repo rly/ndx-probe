@@ -23,11 +23,11 @@ def main():
         neurodata_type_def='Tetrode',
         neurodata_type_inc='ElectrodeGroup',
         doc=('A subtype of ElectrodeGroup to include metadata about a single tetrode (group of 4 closely spaced '
-             'electrodes of a probe or shank.'),
+             'electrodes) on a shank of a probe.'),
         attributes=[
             NWBAttributeSpec(
                 name='location',
-                doc=('Location of the tetrode in the brain'),
+                doc=('Location of the tetrode in the brain.'),
                 dtype='text',
                 required=False
             )
@@ -36,7 +36,7 @@ def main():
             NWBDatasetSpec(
                 name='electrodes',
                 neurodata_type_inc='DynamicTableRegion',
-                doc='Pointer to the rows of the electrodes table corresponding to the electrodes of this tetrode',
+                doc='Pointer to the rows of the electrodes table corresponding to the electrodes of this tetrode.',
             )
         ]
     )
@@ -49,7 +49,7 @@ def main():
             NWBDatasetSpec(
                 name='electrodes',
                 neurodata_type_inc='DynamicTableRegion',
-                doc='Pointer to the rows of the electrodes table corresponding to the electrodes of this shank',
+                doc='Pointer to the rows of the electrodes table corresponding to the electrodes of this shank.',
             )
         ],
         links=[
@@ -118,13 +118,25 @@ def main():
         neurodata_type_def='Probe',
         neurodata_type_inc='ElectrodeGroup',
         doc=('A subtype of ElectrodeGroup to include metadata about a multi-electrode probe.'),
+        attributes=[
+            NWBAttributeSpec(
+                name='model',
+                doc='Model name of the probe.',
+                dtype='text',
+            ),
+            NWBAttributeSpec(
+                name='manufacturer',
+                doc='Manufacturer name of the probe.',
+                dtype='text',
+            ),
+        ],
         datasets=[
             entry_point,
             angle,
             NWBDatasetSpec(
                 name='electrodes',
                 neurodata_type_inc='DynamicTableRegion',
-                doc='Pointer to the rows of the electrodes table corresponding to the electrodes of this probe',
+                doc='Pointer to the rows of the electrodes table corresponding to the electrodes of this probe.',
             )
         ],
         links=[

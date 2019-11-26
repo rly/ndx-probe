@@ -2,17 +2,17 @@ groups:
 - neurodata_type_def: Tetrode
   neurodata_type_inc: ElectrodeGroup
   doc: A subtype of ElectrodeGroup to include metadata about a single tetrode (group
-    of 4 closely spaced electrodes of a probe or shank.
+    of 4 closely spaced electrodes) on a shank of a probe.
   attributes:
   - name: location
     dtype: text
-    doc: Location of the tetrode in the brain
+    doc: Location of the tetrode in the brain.
     required: false
   datasets:
   - name: electrodes
     neurodata_type_inc: DynamicTableRegion
     doc: Pointer to the rows of the electrodes table corresponding to the electrodes
-      of this tetrode
+      of this tetrode.
 - neurodata_type_def: Shank
   neurodata_type_inc: ElectrodeGroup
   doc: A subtype of ElectrodeGroup to include metadata about a single shank of a probe.
@@ -20,7 +20,7 @@ groups:
   - name: electrodes
     neurodata_type_inc: DynamicTableRegion
     doc: Pointer to the rows of the electrodes table corresponding to the electrodes
-      of this shank
+      of this shank.
   links:
   - target_type: Tetrode
     doc: The individual tetrode groups that are part of this shank.
@@ -28,6 +28,13 @@ groups:
 - neurodata_type_def: Probe
   neurodata_type_inc: ElectrodeGroup
   doc: A subtype of ElectrodeGroup to include metadata about a multi-electrode probe.
+  attributes:
+  - name: model
+    dtype: text
+    doc: Model name of the probe.
+  - name: manufacturer
+    dtype: text
+    doc: Manufacturer name of the probe.
   datasets:
   - name: entry_point
     dtype:
@@ -69,7 +76,7 @@ groups:
   - name: electrodes
     neurodata_type_inc: DynamicTableRegion
     doc: Pointer to the rows of the electrodes table corresponding to the electrodes
-      of this probe
+      of this probe.
   links:
   - target_type: Shank
     doc: The individual tetrode groups that are part of this shank. Not necessary
