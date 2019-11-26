@@ -1,0 +1,13 @@
+namespaces:
+- author:
+  - Ryan Ly
+  contact:
+  - rly@lbl.gov
+  doc: An extension to hold metadata about a multi-electrode probe.
+  name: ndx-probe
+  schema:
+  - namespace: core
+    neurodata_types:
+    - ElectricalSeries
+  - source: ndx-probe.extensions.yaml
+  version: 0.1.0
