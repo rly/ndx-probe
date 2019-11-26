@@ -61,13 +61,13 @@ def main():
 
     entry_point_ap_dtype = NWBDtypeSpec(name='ap',
                                         dtype='float',
-                                        doc='Anterior-Posterior coordinate')
+                                        doc='Anterior-Posterior coordinate, in mm.')
     entry_point_lr_dtype = NWBDtypeSpec(name='lr',
                                         dtype='float',
-                                        doc='Left-Right coordinate')
+                                        doc='Left-Right coordinate, in mm.')
     entry_point_dv_dtype = NWBDtypeSpec(name='dv',
                                         dtype='float',
-                                        doc='Dorsal-Ventral coordinate')
+                                        doc='Dorsal-Ventral coordinate, in mm.')
 
     entry_point = NWBDatasetSpec(
         name='entry_point',
@@ -79,6 +79,12 @@ def main():
                 doc=('Description of the reference atlas used for the coordinates, e.g., Allen Institute Common '
                      'Coordinate Framework v3, or stereotaxic coordinates with zero point at ear-bar zero.'),
                 dtype='text'
+            ),
+            NWBAttributeSpec(
+                name='unit',
+                doc='Unit of measurement for the coordinates.',
+                dtype='text',
+                value='millimeters'
             )
         ],
         quantity='?'
@@ -109,6 +115,27 @@ def main():
                 name='reference',
                 doc='Description of the reference frame used for the angles, e.g., which direction is angle zero.',
                 dtype='text'
+            ),
+            NWBAttributeSpec(
+                name='unit',
+                doc='Unit of measurement for the angles.',
+                dtype='text',
+                value='degrees'
+            )
+        ],
+        quantity='?'
+    )
+
+    distance_advanced = NWBDatasetSpec(
+        name='distance_advanced',
+        doc='The distance that the probe was advanced from the surface of the brain, in mm.',
+        dtype='float',
+        attributes=[
+            NWBAttributeSpec(
+                name='unit',
+                doc='Unit of measurement for the distance.',
+                dtype='float',
+                value='millimeters'
             )
         ],
         quantity='?'
@@ -133,6 +160,7 @@ def main():
         datasets=[
             entry_point,
             angle,
+            distance_advanced,
             NWBDatasetSpec(
                 name='electrodes',
                 neurodata_type_inc='DynamicTableRegion',

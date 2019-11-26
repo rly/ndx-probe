@@ -40,13 +40,13 @@ groups:
     dtype:
     - name: ap
       dtype: float
-      doc: Anterior-Posterior coordinate
+      doc: Anterior-Posterior coordinate, in mm.
     - name: lr
       dtype: float
-      doc: Left-Right coordinate
+      doc: Left-Right coordinate, in mm.
     - name: dv
       dtype: float
-      doc: Dorsal-Ventral coordinate
+      doc: Dorsal-Ventral coordinate, in mm.
     doc: The coordinates of the entry point.
     quantity: '?'
     attributes:
@@ -55,6 +55,10 @@ groups:
       doc: Description of the reference atlas used for the coordinates, e.g., Allen
         Institute Common Coordinate Framework v3, or stereotaxic coordinates with
         zero point at ear-bar zero.
+    - name: unit
+      dtype: text
+      value: millimeters
+      doc: Unit of measurement for the coordinates.
   - name: angle
     dtype:
     - name: coronal
@@ -73,6 +77,20 @@ groups:
       dtype: text
       doc: Description of the reference frame used for the angles, e.g., which direction
         is angle zero.
+    - name: unit
+      dtype: text
+      value: degrees
+      doc: Unit of measurement for the angles.
+  - name: distance_advanced
+    dtype: float
+    doc: The distance that the probe was advanced from the surface of the brain, in
+      mm.
+    quantity: '?'
+    attributes:
+    - name: unit
+      dtype: float
+      value: millimeters
+      doc: Unit of measurement for the distance.
   - name: electrodes
     neurodata_type_inc: DynamicTableRegion
     doc: Pointer to the rows of the electrodes table corresponding to the electrodes
