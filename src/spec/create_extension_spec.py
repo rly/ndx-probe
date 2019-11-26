@@ -2,9 +2,8 @@
 
 import os.path
 
-from pynwb.spec import NWBNamespaceBuilder, export_spec, NWBGroupSpec, NWBAttributeSpec
-# TODO: import the following spec classes as needed
-# from pynwb.spec import NWBDatasetSpec, NWBLinkSpec, NWBDtypeSpec, NWBRefSpec
+from pynwb.spec import NWBNamespaceBuilder, export_spec, NWBGroupSpec, NWBAttributeSpec, NWBDatasetSpec, NWBDtypeSpec
+from pynwb.spec import NWBLinkSpec
 
 
 def main():
@@ -17,31 +16,129 @@ def main():
         contact=list(map(str.strip, 'rly@lbl.gov'.split(',')))
     )
 
-    # TODO: specify the neurodata_types that are used by the extension as well
-    # as in which namespace they are found
-    # this is similar to specifying the Python modules that need to be imported
-    # to use your new data types
-    ns_builder.include_type('ElectricalSeries', namespace='core')
+    ns_builder.include_type('ElectrodeGroup', namespace='core')
+    ns_builder.include_type('DynamicTableRegion', namespace='hdmf.common')
 
-    # TODO: define your new data types
-    # see https://pynwb.readthedocs.io/en/latest/extensions.html#extending-nwb
-    # for more information
-    tetrode_series = NWBGroupSpec(
-        neurodata_type_def='TetrodeSeries',
-        neurodata_type_inc='ElectricalSeries',
-        doc=('An extension of ElectricalSeries to include the tetrode ID for '
-             'each time series.'),
+    tetrode = NWBGroupSpec(
+        neurodata_type_def='Tetrode',
+        neurodata_type_inc='ElectrodeGroup',
+        doc=('A subtype of ElectrodeGroup to include metadata about a single tetrode (group of 4 closely spaced '
+             'electrodes of a probe or shank.'),
         attributes=[
             NWBAttributeSpec(
-                name='trode_id',
-                doc='The tetrode ID.',
-                dtype='int32'
+                name='location',
+                doc=('Location of the tetrode in the brain'),
+                dtype='text',
+                required=False
             )
         ],
+        datasets=[
+            NWBDatasetSpec(
+                name='electrodes',
+                neurodata_type_inc='DynamicTableRegion',
+                doc='Pointer to the rows of the electrodes table corresponding to the electrodes of this tetrode',
+            )
+        ]
     )
 
-    # TODO: add all of your new data types to this list
-    new_data_types = [tetrode_series]
+    shank = NWBGroupSpec(
+        neurodata_type_def='Shank',
+        neurodata_type_inc='ElectrodeGroup',
+        doc=('A subtype of ElectrodeGroup to include metadata about a single shank of a probe.'),
+        datasets=[
+            NWBDatasetSpec(
+                name='electrodes',
+                neurodata_type_inc='DynamicTableRegion',
+                doc='Pointer to the rows of the electrodes table corresponding to the electrodes of this shank',
+            )
+        ],
+        links=[
+            NWBLinkSpec(target_type='Tetrode',
+                        doc='The individual tetrode groups that are part of this shank.',
+                        quantity='*')
+        ]
+    )
+
+    entry_point_ap_dtype = NWBDtypeSpec(name='ap',
+                                        dtype='float',
+                                        doc='Anterior-Posterior coordinate')
+    entry_point_lr_dtype = NWBDtypeSpec(name='lr',
+                                        dtype='float',
+                                        doc='Left-Right coordinate')
+    entry_point_dv_dtype = NWBDtypeSpec(name='dv',
+                                        dtype='float',
+                                        doc='Dorsal-Ventral coordinate')
+
+    entry_point = NWBDatasetSpec(
+        name='entry_point',
+        doc='The coordinates of the entry point.',
+        dtype=[entry_point_ap_dtype, entry_point_lr_dtype, entry_point_dv_dtype],
+        attributes=[
+            NWBAttributeSpec(
+                name='reference',
+                doc=('Description of the reference atlas used for the coordinates, e.g., Allen Institute Common '
+                     'Coordinate Framework v3, or stereotaxic coordinates with zero point at ear-bar zero.'),
+                dtype='text'
+            )
+        ],
+        quantity='?'
+    )
+
+    angle_coronal_dtype = NWBDtypeSpec(
+       name='coronal',
+       dtype='float',
+       doc='Coronal angle, in degrees'
+    )
+    angle_sagittal_dtype = NWBDtypeSpec(
+        name='sagittal',
+        dtype='float',
+        doc='Sagittal angle, in degrees'
+    )
+    angle_axial_dtype = NWBDtypeSpec(
+        name='axial',
+        dtype='float',
+        doc='Axial angle, in degrees'
+    )
+
+    angle = NWBDatasetSpec(
+        name='angle',
+        doc='The angle of the probe.',
+        dtype=[angle_coronal_dtype, angle_sagittal_dtype, angle_axial_dtype],
+        attributes=[
+            NWBAttributeSpec(
+                name='reference',
+                doc='Description of the reference frame used for the angles, e.g., which direction is angle zero.',
+                dtype='text'
+            )
+        ],
+        quantity='?'
+    )
+
+    probe = NWBGroupSpec(
+        neurodata_type_def='Probe',
+        neurodata_type_inc='ElectrodeGroup',
+        doc=('A subtype of ElectrodeGroup to include metadata about a multi-electrode probe.'),
+        datasets=[
+            entry_point,
+            angle,
+            NWBDatasetSpec(
+                name='electrodes',
+                neurodata_type_inc='DynamicTableRegion',
+                doc='Pointer to the rows of the electrodes table corresponding to the electrodes of this probe',
+            )
+        ],
+        links=[
+            NWBLinkSpec(target_type='Shank',
+                        doc=('The individual tetrode groups that are part of this shank. Not necessary if there is '
+                             'only one shank on the probe'),
+                        quantity='*'),
+            NWBLinkSpec(target_type='Tetrode',
+                        doc='The individual tetrode groups that are part of this shank.',
+                        quantity='*')
+        ]
+    )
+
+    new_data_types = [tetrode, shank, probe]
 
     # export the spec to yaml files in the spec folder
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'spec'))

@@ -1,8 +1,80 @@
 groups:
-- neurodata_type_def: TetrodeSeries
-  neurodata_type_inc: ElectricalSeries
-  doc: An extension of ElectricalSeries to include the tetrode ID for each time series.
+- neurodata_type_def: Tetrode
+  neurodata_type_inc: ElectrodeGroup
+  doc: A subtype of ElectrodeGroup to include metadata about a single tetrode (group
+    of 4 closely spaced electrodes of a probe or shank.
   attributes:
-  - name: trode_id
-    dtype: int32
-    doc: The tetrode ID.
+  - name: location
+    dtype: text
+    doc: Location of the tetrode in the brain
+    required: false
+  datasets:
+  - name: electrodes
+    neurodata_type_inc: DynamicTableRegion
+    doc: Pointer to the rows of the electrodes table corresponding to the electrodes
+      of this tetrode
+- neurodata_type_def: Shank
+  neurodata_type_inc: ElectrodeGroup
+  doc: A subtype of ElectrodeGroup to include metadata about a single shank of a probe.
+  datasets:
+  - name: electrodes
+    neurodata_type_inc: DynamicTableRegion
+    doc: Pointer to the rows of the electrodes table corresponding to the electrodes
+      of this shank
+  links:
+  - target_type: Tetrode
+    doc: The individual tetrode groups that are part of this shank.
+    quantity: '*'
+- neurodata_type_def: Probe
+  neurodata_type_inc: ElectrodeGroup
+  doc: A subtype of ElectrodeGroup to include metadata about a multi-electrode probe.
+  datasets:
+  - name: entry_point
+    dtype:
+    - name: ap
+      dtype: float
+      doc: Anterior-Posterior coordinate
+    - name: lr
+      dtype: float
+      doc: Left-Right coordinate
+    - name: dv
+      dtype: float
+      doc: Dorsal-Ventral coordinate
+    doc: The coordinates of the entry point.
+    quantity: '?'
+    attributes:
+    - name: reference
+      dtype: text
+      doc: Description of the reference atlas used for the coordinates, e.g., Allen
+        Institute Common Coordinate Framework v3, or stereotaxic coordinates with
+        zero point at ear-bar zero.
+  - name: angle
+    dtype:
+    - name: coronal
+      dtype: float
+      doc: Coronal angle, in degrees
+    - name: sagittal
+      dtype: float
+      doc: Sagittal angle, in degrees
+    - name: axial
+      dtype: float
+      doc: Axial angle, in degrees
+    doc: The angle of the probe.
+    quantity: '?'
+    attributes:
+    - name: reference
+      dtype: text
+      doc: Description of the reference frame used for the angles, e.g., which direction
+        is angle zero.
+  - name: electrodes
+    neurodata_type_inc: DynamicTableRegion
+    doc: Pointer to the rows of the electrodes table corresponding to the electrodes
+      of this probe
+  links:
+  - target_type: Shank
+    doc: The individual tetrode groups that are part of this shank. Not necessary
+      if there is only one shank on the probe
+    quantity: '*'
+  - target_type: Tetrode
+    doc: The individual tetrode groups that are part of this shank.
+    quantity: '*'
