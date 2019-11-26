@@ -183,6 +183,12 @@ def main():
                 doc='Manufacturer name of the probe.',
                 dtype='text',
             ),
+            NWBAttributeSpec(
+                name='id',
+                doc='Serial number or other unique identifier of the probe.',
+                dtype='text',
+                required=False
+            ),
         ],
         datasets=[
             entry_point,
@@ -201,7 +207,7 @@ def main():
         ]
     )
 
-    new_data_types = [tetrode, shank, probe]
+    new_data_types = [stereotrode, tetrode, shank, probe]
 
     # export the spec to yaml files in the spec folder
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'spec'))

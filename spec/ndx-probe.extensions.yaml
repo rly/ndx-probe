@@ -1,4 +1,18 @@
 groups:
+- neurodata_type_def: Stereotrode
+  neurodata_type_inc: ElectrodeGroup
+  doc: A subtype of ElectrodeGroup to include metadata about a single stereotrode
+    (group of 2 closely spaced electrodes) on a shank of a probe.
+  attributes:
+  - name: location
+    dtype: text
+    doc: Location of the stereotrode in the brain.
+    required: false
+  datasets:
+  - name: electrodes
+    neurodata_type_inc: DynamicTableRegion
+    doc: Pointer to the rows of the electrodes table corresponding to the electrodes
+      of this stereotrode.
 - neurodata_type_def: Tetrode
   neurodata_type_inc: ElectrodeGroup
   doc: A subtype of ElectrodeGroup to include metadata about a single tetrode (group
@@ -40,6 +54,10 @@ groups:
   - name: manufacturer
     dtype: text
     doc: Manufacturer name of the probe.
+  - name: id
+    dtype: text
+    doc: Serial number or other unique identifier of the probe.
+    required: false
   datasets:
   - name: entry_point
     dtype:
