@@ -1,3 +1,8 @@
+# API should provide way to get rows of electrodes table for each Stereotrode and Tetrode
+# API should provide access to electrodes and subgroups of Shank
+# API should provide access to electrodes and electrode groups of Probe
+# TODO: update src/spec/create_extension_spec.py to create this file
+
 groups:
 - neurodata_type_def: Stereotrode
   neurodata_type_inc: ElectrodeGroup
@@ -6,13 +11,11 @@ groups:
   attributes:
   - name: location
     dtype: text
-    doc: Location of the stereotrode in the brain.
+    doc: Location of the stereotrode in the brain. Specify the area, layer, comments on
+      estimation of area/layer, etc. Use standard atlas names for anatomical regions when
+      possible.
     required: false
-  datasets:
-  - name: electrodes
-    neurodata_type_inc: DynamicTableRegion
-    doc: Pointer to the rows of the electrodes table corresponding to the electrodes
-      of this stereotrode.
+
 - neurodata_type_def: Tetrode
   neurodata_type_inc: ElectrodeGroup
   doc: A subtype of ElectrodeGroup to include metadata about a single tetrode (group
@@ -20,34 +23,24 @@ groups:
   attributes:
   - name: location
     dtype: text
-    doc: Location of the tetrode in the brain.
+    doc: Location of the tetrode in the brain. Specify the area, layer, comments on
+      estimation of area/layer, etc. Use standard atlas names for anatomical regions when
+      possible.
     required: false
-  datasets:
-  - name: electrodes
-    neurodata_type_inc: DynamicTableRegion
-    doc: Pointer to the rows of the electrodes table corresponding to the electrodes
-      of this tetrode.
+
 - neurodata_type_def: Shank
   neurodata_type_inc: ElectrodeGroup
   doc: A subtype of ElectrodeGroup to include metadata about a single shank of a probe.
-  datasets:
-  - name: electrodes
-    neurodata_type_inc: DynamicTableRegion
-    doc: Pointer to the rows of the electrodes table corresponding to the electrodes
-      of this shank.
-  links:
-  - target_type: Tetrode
-    doc: The individual tetrode groups that are part of this shank.
-    quantity: '*'
-  - target_type: Stereotrode
-    doc: The individual tetrode groups that are part of this shank.
-    quantity: '*'
+
 - neurodata_type_def: Probe
-  neurodata_type_inc: ElectrodeGroup
-  doc: A subtype of ElectrodeGroup to include metadata about a multi-electrode probe,
-    which contains one or many shanks, each of which may contain tetrode groups, each
-    of which contains links to electrodes.
+  neurodata_type_inc: Device
+  doc: Metadata about a multi-electrode probe (or array), which contains one or many shanks.
+    Each shank should be represented as an ElectrodeGroup. Subgroupings within a shank
+    should also be represented as ElectrodeGroups.
   attributes:
+  - name: description
+    dtype: text
+    doc: Description of the device as free-form text.
   - name: model
     dtype: text
     doc: Model name of the probe.
@@ -111,14 +104,7 @@ groups:
     quantity: '?'
     attributes:
     - name: unit
-      dtype: float
+      dtype: text
       value: millimeters
       doc: Unit of measurement for the distance.
-  - name: electrodes
-    neurodata_type_inc: DynamicTableRegion
-    doc: Pointer to the rows of the electrodes table corresponding to the electrodes
-      of this probe.
-  links:
-  - target_type: Shank
-    doc: The individual shanks that are part of this probe.
-    quantity: +
+
