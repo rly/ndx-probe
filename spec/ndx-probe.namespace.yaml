@@ -9,8 +9,5 @@ namespaces:
   - namespace: core
     neurodata_types:
     - ElectrodeGroup
-  - namespace: hdmf.common
-    neurodata_types:
-    - DynamicTableRegion
   - source: ndx-probe.extensions.yaml
   version: 0.1.0

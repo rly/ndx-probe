@@ -3,7 +3,6 @@
 import os.path
 
 from pynwb.spec import NWBNamespaceBuilder, export_spec, NWBGroupSpec, NWBAttributeSpec, NWBDatasetSpec, NWBDtypeSpec
-from pynwb.spec import NWBLinkSpec
 
 
 def main():
@@ -17,7 +16,6 @@ def main():
     )
 
     ns_builder.include_type('ElectrodeGroup', namespace='core')
-    ns_builder.include_type('DynamicTableRegion', namespace='hdmf.common')
 
     stereotrode = NWBGroupSpec(
         neurodata_type_def='Stereotrode',
@@ -27,16 +25,11 @@ def main():
         attributes=[
             NWBAttributeSpec(
                 name='location',
-                doc=('Location of the stereotrode in the brain.'),
+                doc=('Location of the stereotrode in the brain (optional). Specify the area, layer, comments on '
+                     'estimation of area/layer, etc. Use standard atlas names for anatomical regions when '
+                     'possible.'),
                 dtype='text',
                 required=False
-            )
-        ],
-        datasets=[
-            NWBDatasetSpec(
-                name='electrodes',
-                neurodata_type_inc='DynamicTableRegion',
-                doc='Pointer to the rows of the electrodes table corresponding to the electrodes of this stereotrode.',
             )
         ]
     )
@@ -49,16 +42,11 @@ def main():
         attributes=[
             NWBAttributeSpec(
                 name='location',
-                doc=('Location of the tetrode in the brain.'),
+                doc=('Location of the tetrode in the brain (optional). Specify the area, layer, comments on '
+                     'estimation of area/layer, etc. Use standard atlas names for anatomical regions when '
+                     'possible.'),
                 dtype='text',
                 required=False
-            )
-        ],
-        datasets=[
-            NWBDatasetSpec(
-                name='electrodes',
-                neurodata_type_inc='DynamicTableRegion',
-                doc='Pointer to the rows of the electrodes table corresponding to the electrodes of this tetrode.',
             )
         ]
     )
@@ -66,22 +54,7 @@ def main():
     shank = NWBGroupSpec(
         neurodata_type_def='Shank',
         neurodata_type_inc='ElectrodeGroup',
-        doc=('A subtype of ElectrodeGroup to include metadata about a single shank of a probe.'),
-        datasets=[
-            NWBDatasetSpec(
-                name='electrodes',
-                neurodata_type_inc='DynamicTableRegion',
-                doc='Pointer to the rows of the electrodes table corresponding to the electrodes of this shank.',
-            )
-        ],
-        links=[
-            NWBLinkSpec(target_type='Tetrode',
-                        doc='The individual tetrode groups that are part of this shank.',
-                        quantity='*'),
-            NWBLinkSpec(target_type='Stereotrode',
-                        doc='The individual tetrode groups that are part of this shank.',
-                        quantity='*')
-        ]
+        doc=('A subtype of ElectrodeGroup to include metadata about a single shank of a probe.')
     )
 
     entry_point_ap_dtype = NWBDtypeSpec(name='ap',
@@ -97,7 +70,7 @@ def main():
     entry_point = NWBDatasetSpec(
         name='entry_point',
         doc='The coordinates of the entry point.',
-        dtype=[entry_point_ap_dtype, entry_point_lr_dtype, entry_point_dv_dtype],
+        dtype=[entry_point_ap_dtype, entry_point_lr_dtype, entry_point_dv_dtype],  # compound dtype
         attributes=[
             NWBAttributeSpec(
                 name='reference',
@@ -134,7 +107,7 @@ def main():
     angle = NWBDatasetSpec(
         name='angle',
         doc='The angle of the probe.',
-        dtype=[angle_coronal_dtype, angle_sagittal_dtype, angle_axial_dtype],
+        dtype=[angle_coronal_dtype, angle_sagittal_dtype, angle_axial_dtype],  # compound dtype
         attributes=[
             NWBAttributeSpec(
                 name='reference',
@@ -159,7 +132,7 @@ def main():
             NWBAttributeSpec(
                 name='unit',
                 doc='Unit of measurement for the distance.',
-                dtype='float',
+                dtype='text',
                 value='millimeters'
             )
         ],
@@ -168,11 +141,16 @@ def main():
 
     probe = NWBGroupSpec(
         neurodata_type_def='Probe',
-        neurodata_type_inc='ElectrodeGroup',
-        doc=('A subtype of ElectrodeGroup to include metadata about a multi-electrode probe, which contains '
-             'one or many shanks, each of which may contain tetrode groups, each of which contains links to '
-             'electrodes.'),
+        neurodata_type_inc='Device',
+        doc=('Metadata about a multi-electrode probe (or array), which contains one or many shanks. '
+             'Each shank should be represented as an ElectrodeGroup. Sub-groupings within a shank '
+             'should also be represented as ElectrodeGroups.'),
         attributes=[
+            NWBAttributeSpec(
+                name='description',
+                doc='Description of the probe as free-form text.',
+                dtype='text',
+            ),
             NWBAttributeSpec(
                 name='model',
                 doc='Model name of the probe.',
@@ -194,16 +172,6 @@ def main():
             entry_point,
             angle,
             distance_advanced,
-            NWBDatasetSpec(
-                name='electrodes',
-                neurodata_type_inc='DynamicTableRegion',
-                doc='Pointer to the rows of the electrodes table corresponding to the electrodes of this probe.',
-            )
-        ],
-        links=[
-            NWBLinkSpec(target_type='Shank',
-                        doc='The individual shanks that are part of this probe.',
-                        quantity='+')
         ]
     )
 
